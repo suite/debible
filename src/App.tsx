@@ -13,8 +13,9 @@ interface LoreItem {
 function App() {
   const [loreItems, setLoreItems] = useState<LoreItem[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [loadedImages, setLoadedImages] = useState<Set<string>>(new Set());
   const [isLoading, setIsLoading] = useState(true);
+  const [isImageLoading, setIsImageLoading] = useState(true);
+  const [showLoader, setShowLoader] = useState(false);
 
   useEffect(() => {
     Papa.parse('/bookofdegod.csv', {
@@ -23,21 +24,22 @@ function App() {
       complete: (results) => {
         const items = results.data as LoreItem[];
         setLoreItems(items);
-        preloadImages(items);
         setIsLoading(false);
       },
     });
   }, []);
 
-  const preloadImages = (items: LoreItem[]) => {
-    items.forEach((item) => {
-      const img = new Image();
-      img.src = item["Content link (standardized)"];
-      img.onload = () => {
-        setLoadedImages((prev) => new Set(prev).add(item["ID [ignore]"]));
-      };
-    });
-  };
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (isImageLoading) {
+      timer = setTimeout(() => {
+        setShowLoader(true);
+      }, 100);
+    } else {
+      setShowLoader(false);
+    }
+    return () => clearTimeout(timer);
+  }, [isImageLoading]);
 
   const formatText = (text: string) => {
     return text.split('\n').map((line, index) => (
@@ -48,20 +50,31 @@ function App() {
     ));
   };
 
-  const currentItem = loreItems[currentIndex];
+  const handleImageLoad = () => {
+    setIsImageLoading(false);
+  };
+
+  const changeItem = (newIndex: number) => {
+    setIsImageLoading(true);
+    setCurrentIndex(newIndex);
+  };
 
   const handlePrev = () => {
-    setCurrentIndex((prevIndex) => (prevIndex > 0 ? prevIndex - 1 : loreItems.length - 1));
+    const newIndex = currentIndex > 0 ? currentIndex - 1 : loreItems.length - 1;
+    changeItem(newIndex);
   };
 
   const handleNext = () => {
-    setCurrentIndex((prevIndex) => (prevIndex < loreItems.length - 1 ? prevIndex + 1 : 0));
+    const newIndex = currentIndex < loreItems.length - 1 ? currentIndex + 1 : 0;
+    changeItem(newIndex);
   };
 
   const handleRandom = () => {
     const randomIndex = Math.floor(Math.random() * loreItems.length);
-    setCurrentIndex(randomIndex);
+    changeItem(randomIndex);
   };
+
+  const currentItem = loreItems[currentIndex];
 
   return (
     <div className="min-h-screen bg-white text-black flex flex-col">
@@ -86,13 +99,17 @@ function App() {
 
             {/* Image */}
             <div className="mb-4 flex justify-center">
-              {loadedImages.has(currentItem["ID [ignore]"]) && (
-                <img 
-                  src={currentItem["Content link (standardized)"]} 
-                  alt={currentItem["ID [ignore]"]} 
-                  className="max-w-full max-h-[70vh] object-contain"
-                />
+              {showLoader && (
+                <div className="w-full h-[300px] flex items-center justify-center">
+                  <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-[#2600FF]"></div>
+                </div>
               )}
+              <img 
+                src={currentItem["Content link (standardized)"]} 
+                alt={currentItem["ID [ignore]"]} 
+                className={`max-w-full max-h-[70vh] object-contain ${isImageLoading ? 'hidden' : ''}`}
+                onLoad={handleImageLoad}
+              />
             </div>
 
             {/* Caption */}
@@ -102,8 +119,10 @@ function App() {
 
             {/* View on X button */}
             <div className="mb-8">
-              <a href={currentItem["Original post (link)"]} target="_blank" rel="noopener noreferrer" className="bg-white text-[#2600FF] border border-[#2600FF] rounded-full px-4 py-1 text-sm inline-block">
-                View on X
+              <a href={currentItem["Original post (link)"]} target="_blank" rel="noopener noreferrer" className="bg-white text-[#2600FF] border border-[#2600FF] rounded-full px-4 py-2 text-sm inline-flex items-center">
+                View on <svg width="16" height="16" viewBox="0 0 300 300.251" version="1.1" xmlns="http://www.w3.org/2000/svg" className="ml-2">
+                  <path fill="#2600FF" d="M178.57 127.15 290.27 0h-26.46l-97.03 110.38L89.34 0H0l117.13 166.93L0 300.25h26.46l102.4-116.59 81.8 116.59h89.34M36.01 19.54H76.66l187.13 262.13h-40.66"/>
+                </svg>
               </a>
             </div>
           </div>
