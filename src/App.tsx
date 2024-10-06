@@ -14,6 +14,7 @@ function App() {
   const [loreItems, setLoreItems] = useState<LoreItem[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [loadedImages, setLoadedImages] = useState<Set<string>>(new Set());
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     Papa.parse('/bookofdegod.csv', {
@@ -23,6 +24,7 @@ function App() {
         const items = results.data as LoreItem[];
         setLoreItems(items);
         preloadImages(items);
+        setIsLoading(false);
       },
     });
   }, []);
@@ -61,58 +63,60 @@ function App() {
     setCurrentIndex(randomIndex);
   };
 
-  if (!currentItem) return <div>Loading...</div>;
-
   return (
     <div className="min-h-screen bg-white text-black flex flex-col">
-      <div className="flex-grow">
-        {/* Navigation */}
-        <nav className="flex justify-center items-center p-4">
-          <button onClick={handlePrev} className="text-[#2600FF] border border-[#2600FF] px-4 py-2 h-10">Prev</button>
-          <button onClick={handleRandom} className="bg-[#2600FF] text-white px-4 py-2 mx-2 h-10">click or pasta dies</button>
-          <button onClick={handleNext} className="text-[#2600FF] border border-[#2600FF] px-4 py-2 h-10">Next</button>
-        </nav>
+      {!isLoading && loreItems.length > 0 && (
+        <>
+          <div className="flex-grow max-w-4xl mx-auto w-full px-4">
+            {/* Navigation */}
+            <nav className="flex justify-center items-center p-4">
+              <button onClick={handlePrev} className="text-[#2600FF] border border-[#2600FF] px-4 py-2 h-10">Prev</button>
+              <button onClick={handleRandom} className="bg-[#2600FF] text-white px-4 py-2 mx-2 h-10">click or pasta dies</button>
+              <button onClick={handleNext} className="text-[#2600FF] border border-[#2600FF] px-4 py-2 h-10">Next</button>
+            </nav>
 
-        {/* Horizontal line */}
-        <hr className="border-t border-[#E4E4E4]" />
-  
-        {/* Date info */}
-        <div className="text-[#A8A8A8] text-sm p-4 flex justify-between items-center">
-          <span>{currentIndex + 1} of {loreItems.length}</span>
-          <span>{currentItem.Date}</span>
-        </div>
+            {/* Horizontal line */}
+            <hr className="border-t border-[#E4E4E4]" />
+    
+            {/* Date info */}
+            <div className="text-[#A8A8A8] text-sm py-4 flex justify-between items-center">
+              <span>{currentIndex + 1} of {loreItems.length}</span>
+              <span>{currentItem.Date}</span>
+            </div>
 
-        {/* Image */}
-        <div className="w-full mb-4 flex justify-center">
-          {loadedImages.has(currentItem["ID [ignore]"]) && (
-            <img 
-              src={currentItem["Content link (standardized)"]} 
-              alt={currentItem["ID [ignore]"]} 
-              className="max-w-full max-h-[70vh] object-contain"
-            />
-          )}
-        </div>
+            {/* Image */}
+            <div className="mb-4 flex justify-center">
+              {loadedImages.has(currentItem["ID [ignore]"]) && (
+                <img 
+                  src={currentItem["Content link (standardized)"]} 
+                  alt={currentItem["ID [ignore]"]} 
+                  className="max-w-full max-h-[70vh] object-contain"
+                />
+              )}
+            </div>
 
-        {/* Caption */}
-        <p className="font-['EB_Garamond'] font-semibold text-[30px] leading-[36px] tracking-[-0.05em] px-4 mb-4">
-          {formatText(currentItem["Text (main text for page)"])}
-        </p>
+            {/* Caption */}
+            <p className="font-['EB_Garamond'] font-semibold text-[30px] leading-[36px] tracking-[-0.05em] mb-4">
+              {formatText(currentItem["Text (main text for page)"])}
+            </p>
 
-        {/* View on X button */}
-        <div className="px-4 mb-8">
-          <a href={currentItem["Original post (link)"]} target="_blank" rel="noopener noreferrer" className="bg-white text-[#2600FF] border border-[#2600FF] rounded-full px-4 py-1 text-sm inline-block">
-            View on X
-          </a>
-        </div>
-      </div>
+            {/* View on X button */}
+            <div className="mb-8">
+              <a href={currentItem["Original post (link)"]} target="_blank" rel="noopener noreferrer" className="bg-white text-[#2600FF] border border-[#2600FF] rounded-full px-4 py-1 text-sm inline-block">
+                View on X
+              </a>
+            </div>
+          </div>
 
-      {/* Footer section */}
-      <div className="mt-auto pb-4">
-        {/* Created by */}
-        <footer className="text-[#A8A8A8] text-sm text-center p-2">
-          Created by <u><a href="https://twitter.com/capsjpeg" target="_blank" rel="noopener noreferrer">Caps</a></u>, <u><a href="https://twitter.com/misterholana" target="_blank" rel="noopener noreferrer">h_</a></u>, and <u><a href="https://twitter.com/0x_saddy" target="_blank" rel="noopener noreferrer">Saddy</a></u>.
-        </footer>
-      </div>
+          {/* Footer section */}
+          <div className="mt-auto pb-4">
+            {/* Created by */}
+            <footer className="text-[#A8A8A8] text-sm text-center p-2">
+              Created by <u><a href="https://twitter.com/capsjpeg" target="_blank" rel="noopener noreferrer">Caps</a></u>, <u><a href="https://twitter.com/misterholana" target="_blank" rel="noopener noreferrer">h_</a></u>, and <u><a href="https://twitter.com/0x_saddy" target="_blank" rel="noopener noreferrer">Saddy</a></u>.
+            </footer>
+          </div>
+        </>
+      )}
     </div>
   );
 }
