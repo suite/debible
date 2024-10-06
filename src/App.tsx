@@ -16,6 +16,7 @@ function App() {
   const [isLoading, setIsLoading] = useState(true);
   const [isImageLoading, setIsImageLoading] = useState(true);
   const [showLoader, setShowLoader] = useState(false);
+  const [imageAspectRatio, setImageAspectRatio] = useState(16 / 9); // Default aspect ratio
 
   useEffect(() => {
     Papa.parse('/bookofdegod.csv', {
@@ -50,7 +51,9 @@ function App() {
     ));
   };
 
-  const handleImageLoad = () => {
+  const handleImageLoad = (event: React.SyntheticEvent<HTMLImageElement, Event>) => {
+    const img = event.currentTarget;
+    setImageAspectRatio(img.naturalWidth / img.naturalHeight);
     setIsImageLoading(false);
   };
 
@@ -97,19 +100,24 @@ function App() {
               <span>{currentItem.Date}</span>
             </div>
 
-            {/* Image */}
+            {/* Image container with placeholder */}
             <div className="mb-4 flex justify-center">
-              {showLoader && (
-                <div className="w-full h-[300px] flex items-center justify-center">
-                  <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-[#2600FF]"></div>
-                </div>
-              )}
-              <img 
-                src={currentItem["Content link (standardized)"]} 
-                alt={currentItem["ID [ignore]"]} 
-                className={`max-w-full max-h-[70vh] object-contain ${isImageLoading ? 'hidden' : ''}`}
-                onLoad={handleImageLoad}
-              />
+              <div 
+                style={{ paddingBottom: `${(1 / imageAspectRatio) * 100}%` }}
+                className="w-full relative"
+              >
+                {showLoader && (
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-[#2600FF]"></div>
+                  </div>
+                )}
+                <img 
+                  src={currentItem["Content link (standardized)"]} 
+                  alt={currentItem["ID [ignore]"]} 
+                  className={`absolute inset-0 w-full h-full object-contain ${isImageLoading ? 'opacity-50' : 'opacity-100'}`}
+                  onLoad={handleImageLoad}
+                />
+              </div>
             </div>
 
             {/* Caption */}
