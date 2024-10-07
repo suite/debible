@@ -43,12 +43,43 @@ function App() {
   }, [isImageLoading]);
 
   const formatText = (text: string) => {
-    return text.split('\n').map((line, index) => (
-      <React.Fragment key={index}>
-        {line}
-        {index < text.split('\n').length - 1 && <br />}
-      </React.Fragment>
-    ));
+    const linkRegex = /\[([^\]]+)\]\s+\((https?:\/\/[^\s\)]+)\)/g;
+    
+    return text.split('\n').map((line, lineIndex) => {
+      const parts = [];
+      let lastIndex = 0;
+      let match;
+
+      while ((match = linkRegex.exec(line)) !== null) {
+        if (lastIndex < match.index) {
+          parts.push(line.slice(lastIndex, match.index));
+        }
+        const linkText = match[1].startsWith('@') ? match[1] : match[2];
+        parts.push(
+          <a
+            key={match.index}
+            href={match[2]}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[#1E30D8]"
+          >
+            {linkText}
+          </a>
+        );
+        lastIndex = match.index + match[0].length;
+      }
+
+      if (lastIndex < line.length) {
+        parts.push(line.slice(lastIndex));
+      }
+
+      return (
+        <React.Fragment key={lineIndex}>
+          {parts}
+          {lineIndex < text.split('\n').length - 1 && <br />}
+        </React.Fragment>
+      );
+    });
   };
 
   const handleImageLoad = (event: React.SyntheticEvent<HTMLImageElement, Event>) => {
@@ -85,9 +116,9 @@ function App() {
         <>
           <div className="flex-grow max-w-4xl mx-auto w-full px-4">
             {/* Navigation */}
-            <nav className="flex justify-center items-center p-4">
+            <nav className="flex justify-center items-center p-4">  
               <button onClick={handlePrev} className="text-[#2600FF] border border-[#2600FF] px-4 py-2 h-10">Prev</button>
-              <button onClick={handleRandom} className="bg-[#2600FF] text-white px-4 py-2 mx-2 h-10">click or pasta dies</button>
+              <button onClick={handleRandom} className="bg-[#2600FF] text-white px-4 py-2 mx-2 h-10">random</button>
               <button onClick={handleNext} className="text-[#2600FF] border border-[#2600FF] px-4 py-2 h-10">Next</button>
             </nav>
 
