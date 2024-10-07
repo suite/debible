@@ -61,7 +61,7 @@ function App() {
             href={match[2]}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-[#1E30D8]"
+            className="text-black underline hover:text-[#1E30D8] transition-colors duration-200"
           >
             {linkText}
           </a>
@@ -114,7 +114,7 @@ function App() {
     <div className="min-h-screen bg-white text-black flex flex-col">
       {!isLoading && loreItems.length > 0 && (
         <>
-          <div className="flex-grow max-w-4xl mx-auto w-full px-4">
+          <div className="flex-grow max-w-[400px] mx-auto w-full px-4">
             {/* Navigation */}
             <nav className="flex justify-center items-center p-4">  
               <button onClick={handlePrev} className="text-[#2600FF] border border-[#2600FF] px-4 py-2 h-10">Prev</button>
@@ -135,7 +135,7 @@ function App() {
             <div className="mb-4 flex justify-center">
               <div 
                 style={{ paddingBottom: `${(1 / imageAspectRatio) * 100}%` }}
-                className="w-full relative"
+                className="w-full max-w-[400px] relative"
               >
                 {showLoader && (
                   <div className="absolute inset-0 flex items-center justify-center">
@@ -167,7 +167,7 @@ function App() {
           </div>
 
           {/* Footer section */}
-          <div className="mt-auto pb-4">
+          <div className="mt-auto pb-4 max-w-[400px] mx-auto w-full">
             {/* Created by */}
             <footer className="text-[#A8A8A8] text-sm text-center p-2">
               Created by <u><a href="https://twitter.com/capsjpeg" target="_blank" rel="noopener noreferrer">Caps</a></u>, <u><a href="https://twitter.com/misterholana" target="_blank" rel="noopener noreferrer">h_</a></u>, and <u><a href="https://twitter.com/0x_saddy" target="_blank" rel="noopener noreferrer">Saddy</a></u>.
