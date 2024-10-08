@@ -44,6 +44,7 @@ function App() {
 
   const formatText = (text: string) => {
     const linkRegex = /\[([^\]]+)\]\s+\((https?:\/\/[^\s\)]+)\)/g;
+    const strikethroughWords = ['Nippies', 'Duppies'];
     
     return text.split('\n').map((line, lineIndex) => {
       const parts = [];
@@ -52,7 +53,7 @@ function App() {
 
       while ((match = linkRegex.exec(line)) !== null) {
         if (lastIndex < match.index) {
-          parts.push(line.slice(lastIndex, match.index));
+          parts.push(applyStrikethrough(line.slice(lastIndex, match.index)));
         }
         const linkText = match[1].startsWith('@') ? match[1] : match[2];
         parts.push(
@@ -63,14 +64,14 @@ function App() {
             rel="noopener noreferrer"
             className="text-black underline hover:text-[#1E30D8] transition-colors duration-200"
           >
-            {linkText}
+            {applyStrikethrough(linkText)}
           </a>
         );
         lastIndex = match.index + match[0].length;
       }
 
       if (lastIndex < line.length) {
-        parts.push(line.slice(lastIndex));
+        parts.push(applyStrikethrough(line.slice(lastIndex)));
       }
 
       return (
@@ -79,6 +80,16 @@ function App() {
           {lineIndex < text.split('\n').length - 1 && <br />}
         </React.Fragment>
       );
+    });
+  };
+
+  const applyStrikethrough = (text: string) => {
+    const strikethroughWords = ['Nippies', 'Duppies'];
+    return text.split(' ').map((word, index) => {
+      if (strikethroughWords.includes(word)) {
+        return <del key={index}>{word}</del>;
+      }
+      return word + ' ';
     });
   };
 
@@ -139,7 +150,7 @@ function App() {
               >
                 {showLoader && (
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-[#2600FF]"></div>
+                    <img src="/loading.gif" alt="Loading" className="w-16 h-16" />
                   </div>
                 )}
                 <img 
