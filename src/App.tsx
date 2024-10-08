@@ -141,8 +141,8 @@ function App() {
             </nav>
 
             {/* Horizontal line container */}
-            <div className="w-full">
-              <hr className="border-t border-[#E4E4E4]" />
+            <div className="w-screen relative left-1/2 right-1/2 -mx-[50vw]">
+              <hr className="border-t border-[#E4E4E4] w-full" />
             </div>
     
             {/* Date info */}
